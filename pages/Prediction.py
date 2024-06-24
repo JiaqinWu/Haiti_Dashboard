@@ -435,7 +435,7 @@ if save_button and st.session_state['result'] is not None:
 
     try:
         # Clear and update Google Sheets with the updated sheet DataFrame
-        worksheet11.clear()
+        #worksheet11.clear()
         worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
 
         st.sidebar.write("The prediction result has been submitted and Google Sheets updated.")
