@@ -1,7 +1,6 @@
 plotly
 xgboost
 scikit-learn
-pickle
 millify
 streamlit_extras
 plotly
