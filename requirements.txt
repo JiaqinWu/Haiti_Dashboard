@@ -6,3 +6,4 @@ streamlit_extras
 plotly
 altair
 gsheetsdb==0.1.13.1
+gspread
