@@ -337,7 +337,7 @@ recent = st.sidebar.selectbox('Last Viral Load Result', options=['Detectable', '
 
 # Define a button to trigger predictions
 predict_button = st.sidebar.button("Predict",key='predict_button')
-save_button = st.sidebar.button("Save Results", key='save_button') 
+#save_button = st.sidebar.button("Save Results", key='save_button') 
 
 
 # Import the scaler and model
@@ -396,48 +396,51 @@ with st.container():
         # Display the radar plot
         st.plotly_chart(fig)
 
-    with col2:
-        # Combine continuous and categorical variables without scaling lis2
-        input_array = np.array(lis1 + lis2).reshape(1, -1)
+    # Prediction and saving logic
+if predict_button:
+    # Combine continuous and categorical variables without scaling lis2
+    input_array = np.array(lis1 + lis2).reshape(1, -1)
 
-        # Display the prediction result
-        st.subheader('Treatment Status Prediction')
+    # Check if the "Predict" button is clicked
+    if predict_button:
+        # Scale the continuous variables
+        input_data_scaled = scaler.transform(input_array[:, :len(lis1)])
+        # Combine the scaled continuous variables and categorical variables
+        input_data_fin = np.concatenate([input_data_scaled, input_array[:, len(lis1):]], axis=1)
+        # Make predictions
+        prediction = model.predict(input_data_fin)
 
-        # Check if the "Predict" button is clicked
-        if predict_button:
-            # Scale the continuous variables
-            input_data_scaled = scaler.transform(input_array[:, :len(lis1)])
-            # Combine the scaled continuous variables and categorical variables
-            input_data_fin = np.concatenate([input_data_scaled, input_array[:, len(lis1):]], axis=1)
-            # Make predictions
-            prediction = model.predict(input_data_fin)
-
-            if prediction == 1:
-                st.write("<div style='font-size:30px; color:#8B0000;'>Actif</div>", unsafe_allow_html=True)
-            else:
-                st.write("<div style='font-size:30px; color:#8B0000;'>PIT</div>", unsafe_allow_html=True)
-            result = 'Actif' if prediction == 1 else 'PIT'
-
+        if prediction == 1:
+            st.write("<div style='font-size:30px; color:#8B0000;'>Actif</div>", unsafe_allow_html=True)
         else:
-            # Display an empty space
-            st.write(" " * 50)
+            st.write("<div style='font-size:30px; color:#8B0000;'>PIT</div>", unsafe_allow_html=True)
+        result = 'Actif' if prediction == 1 else 'PIT'
 
-        st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
+    else:
+        # Display an empty space
+        st.write(" " * 50)
+
+    st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
+
+    # Dummy save button
+    save_button = st.button('Save Results', key='save_button') 
+
+    if save_button:
+        new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': result}
+        new_data = pd.DataFrame([new_row])
+
+        # Append new_data to existing sheet DataFrame
+        sheet1 = pd.concat([sheet1, new_data], ignore_index=True)
+
+        try:
+            # Clear and update Google Sheets with the updated sheet DataFrame
+            worksheet11.clear()
+            worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
+
+            st.write("The prediction result has been submitted and Google Sheets updated.")
+        except Exception as e:
+            st.error(f"Error updating Google Sheets: {str(e)}")
 
 
-
-if save_button:
-    new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': result}
-    new_data = pd.DataFrame([new_row])
-
-    # Append new_data to existing sheet DataFrame
-    sheet1 = pd.concat([sheet1, new_data], ignore_index=True)
-
-    try:
-        # Clear and update Google Sheets with the updated sheet DataFrame
-        worksheet11.clear()
-        worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
-
-        st.sidebar.write("The prediction result has been submitted and Google Sheets updated.")
-    except Exception as e:
-        st.sidebar.error(f"Error updating Google Sheets: {str(e)}")
+# Display disclaimer
+st.sidebar.markdown("This app assists medical professionals in making a diagnosis, but should not be used as a substitute for professional diagnosis.")
