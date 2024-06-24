@@ -9,25 +9,36 @@ import plotly.graph_objects as go
 import warnings 
 warnings.filterwarnings('ignore')
 
+
+# Main page content
+st.set_page_config(page_title = 'Haiti EMR System', page_icon='🇭🇹',layout='wide')
+
 # Import Logo
 image = "CGHPI.png"
 
-# Load data
-df1 = pd.read_csv("pages/Datasets/Dataset_Dispense_03_25_2024.csv")
-df2 = pd.read_csv("pages/Datasets/Dataset_HistoricalStatus_03_25_2024.csv")
-df3 = pd.read_csv("pages/Datasets/Dataset_Institution_03_25_2024.csv")
-df4 = pd.read_csv("pages/Datasets/Dataset_Patientunique_03_25_2024.csv")
-df5 = pd.read_csv("pages/Datasets/Dataset_TestCV_03_25_2024.csv")
-df6 = pd.read_csv("pages/Datasets/Dataset_Visit_03_25_2024.csv")
-institution = pd.read_csv("pages/Datasets/Institution_codebook.csv")
+# Function to load data with caching
+@st.cache_data
+def load_data(file_path):
+    return pd.read_csv(file_path)
 
-# Set up the page configuration
-st.set_page_config(
-    page_title="HIV Treatment Status Prediction",
-    page_icon="👩‍⚕️",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# Load data with caching
+df1 = load_data("pages/Datasets/Dataset_Dispense_03_25_2024(1).csv")
+df2 = load_data("pages/Datasets/Dataset_HistoricalStatus_03_25_2024(1).csv")
+df3 = load_data("pages/Datasets/Dataset_Institution_03_25_2024.csv")
+df4 = load_data("pages/Datasets/Dataset_Patientunique_03_25_2024(1).csv")
+df5 = load_data("pages/Datasets/Dataset_TestCV_03_25_2024(1).csv")
+df6 = load_data("pages/Datasets/Dataset_Visit_03_25_2024(1).csv")
+institution = load_data("pages/Datasets/Institution_codebook.csv")
+
+#df1 = load_data("pages/Datasets/Dataset_Dispense_03_25_2024.csv")
+#df2 = load_data("pages/Datasets/Dataset_HistoricalStatus_03_25_2024.csv")
+#df3 = load_data("pages/Datasets/Dataset_Institution_03_25_2024.csv")
+#df4 = load_data("pages/Datasets/Dataset_Patientunique_03_25_2024.csv")
+#df5 = load_data("pages/Datasets/Dataset_TestCV_03_25_2024.csv")
+#df6 = load_data("pages/Datasets/Dataset_Visit_03_25_2024.csv")
+#institution = load_data("pages/Datasets/Institution_codebook.csv")
+
+
 
 # Use columns for side-by-side layout
 col1, col2 = st.columns([1, 6])  # Adjust the width ratio as needed

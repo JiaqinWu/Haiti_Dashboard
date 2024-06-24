@@ -11,17 +11,56 @@ import altair as alt
 #import seaborn as sns
 #import plotnine
 #from plotnine import *
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import json
 import warnings 
 warnings.filterwarnings('ignore')
 
+
+# Main page content
+st.set_page_config(page_title = 'Haiti EMR System', page_icon='🇭🇹',layout='wide')
+
+# Function to load data with caching
+@st.cache_data
+def load_data(file_path):
+    return pd.read_csv(file_path)
+
+# Load data with caching
+df1 = load_data("pages/Datasets/Dataset_Dispense_03_25_2024(1).csv")
+df2 = load_data("pages/Datasets/Dataset_HistoricalStatus_03_25_2024(1).csv")
+df3 = load_data("pages/Datasets/Dataset_Institution_03_25_2024.csv")
+df4 = load_data("pages/Datasets/Dataset_Patientunique_03_25_2024(1).csv")
+df5 = load_data("pages/Datasets/Dataset_TestCV_03_25_2024(1).csv")
+df6 = load_data("pages/Datasets/Dataset_Visit_03_25_2024(1).csv")
+institution = load_data("pages/Datasets/Institution_codebook.csv")
+
+#df1 = load_data("pages/Datasets/Dataset_Dispense_03_25_2024.csv")
+#df2 = load_data("pages/Datasets/Dataset_HistoricalStatus_03_25_2024.csv")
+#df3 = load_data("pages/Datasets/Dataset_Institution_03_25_2024.csv")
+#df4 = load_data("pages/Datasets/Dataset_Patientunique_03_25_2024.csv")
+#df5 = load_data("pages/Datasets/Dataset_TestCV_03_25_2024.csv")
+#df6 = load_data("pages/Datasets/Dataset_Visit_03_25_2024.csv")
+#institution = load_data("pages/Datasets/Institution_codebook.csv")
+
 # Load data
-df1 = pd.read_csv("pages/Datasets/Dataset_Dispense_03_25_2024.csv")
-df2 = pd.read_csv("pages/Datasets/Dataset_HistoricalStatus_03_25_2024.csv")
-df3 = pd.read_csv("pages/Datasets/Dataset_Institution_03_25_2024.csv")
-df4 = pd.read_csv("pages/Datasets/Dataset_Patientunique_03_25_2024.csv")
-df5 = pd.read_csv("pages/Datasets/Dataset_TestCV_03_25_2024.csv")
-df6 = pd.read_csv("pages/Datasets/Dataset_Visit_03_25_2024.csv")
-institution = pd.read_csv("pages/Datasets/Institution_codebook.csv")
+#df1 = pd.read_csv("pages/Datasets/Dataset_Dispense_03_25_2024.csv")
+#df2 = pd.read_csv("pages/Datasets/Dataset_HistoricalStatus_03_25_2024.csv")
+#df3 = pd.read_csv("pages/Datasets/Dataset_Institution_03_25_2024.csv")
+#df4 = pd.read_csv("pages/Datasets/Dataset_Patientunique_03_25_2024.csv")
+#df5 = pd.read_csv("pages/Datasets/Dataset_TestCV_03_25_2024.csv")
+#df6 = pd.read_csv("pages/Datasets/Dataset_Visit_03_25_2024.csv")
+#scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
+#creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+
+# Use Streamlit's secrets management
+#creds_dict = st.secrets["gcp_service_account"]
+#creds_json = json.dumps(creds_dict)
+#creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(creds_json), scope)
+#client = gspread.authorize(creds)
+ 
+#df4 = pd.DataFrame(client.open('Dataset_Patient_Unique_06-28-23').get_worksheet(0).get_all_records())
+#institution = pd.read_csv("pages/Datasets/Institution_codebook.csv")
 image = "CGHPI.png"
 sheet = pd.DataFrame(columns=['Date', 'EMR ID', 'Institution Name', 'Comments'])
 
@@ -29,9 +68,6 @@ sheet = pd.DataFrame(columns=['Date', 'EMR ID', 'Institution Name', 'Comments'])
 # Create a connection object.
 #conn = st.connection("gsheets", type=GSheetsConnection)
 #sheet = conn.read(spreadsheet = "https://docs.google.com/spreadsheets/d/1RgNkeB9F0PyOZsjNRc6VCRgHccRAnwQ1rWVJXC2lYXI/edit?gid=0#gid=0")
-
-# Main page content
-st.set_page_config(page_title = 'Haiti EMR System', page_icon='🇭🇹',layout='wide')
 
 # Use columns for side-by-side layout
 col1, col2 = st.columns([1, 6])  # Adjust the width ratio as needed
@@ -113,6 +149,7 @@ if search_button:
 # Patient tab
 with tab1:
     st.markdown("### 😷 Welcome to the Patient tab!")
+    st.markdown("#### This tab will provide patient-level information, including gender, birthdate, diagnosis date, and details of the facility visited and place of residence.")
 
     if st.session_state.search_results:
         joint = st.session_state.search_results
@@ -195,6 +232,8 @@ with tab1:
 # Dispensation tab
 with tab2:
     st.markdown("### 💊 Welcome to the Dispensation tab!")
+    st.markdown("#### This tab will provide dispensation-level information, including historical dispensation records, the first dispensation date, the number of years receiving dispensation, the percentage of early/on-time/late dispensations, average early or late dispensation days, average dispensation gap, historical treatment records, and the number of Actif years.")
+
     
     if st.session_state.search_results:
         joint = st.session_state.search_results
@@ -294,6 +333,7 @@ with tab2:
 # Visit tab
 with tab3:
     st.markdown("### 🏥 Welcome to the Visit tab!")
+    st.markdown("#### This tab will provide visit-level information, including historical visit records, number of visits and average gap between visits.")
 
     if st.session_state.search_results:
         joint = st.session_state.search_results
@@ -347,6 +387,7 @@ with tab3:
 # Diagnostics tab
 with tab4:
     st.markdown("### 🥼Welcome to the Diagnostics tab!")
+    st.markdown("#### This tab will provide diagnostics-level information, including historical viral load test records, number of VL tests and recent VL test results.")
 
     if st.session_state.search_results:
         joint = st.session_state.search_results
