@@ -403,23 +403,6 @@ def display_predictions(lis1, lis2, model, scaler):
             st.write("<div style='font-size:30px; color:#8B0000;'>PIT</div>", unsafe_allow_html=True)
         result = 'Actif' if prediction == 1 else 'PIT'
 
-        save_button = st.button("Save Results", key='save_button')
-        if save_button:
-            new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': result}
-            new_data = pd.DataFrame([new_row])
-
-            # Append new_data to existing sheet DataFrame
-            sheet1 = pd.concat([sheet1, new_data], ignore_index=True)
-
-            try:
-                # Clear and update Google Sheets with the updated sheet DataFrame
-                worksheet11.clear()
-                worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
-
-                st.write("The prediction result has been submitted and Google Sheets updated.")
-            except Exception as e:
-                st.error(f"Error updating Google Sheets: {str(e)}")
-
     else:
         # Display an empty space
         st.write(" " * 50)
@@ -446,3 +429,20 @@ with st.container():
 
     with col2:
         display_predictions(lis1, lis2, model, scaler)
+
+save_button = st.sidebar.button("Save Results", key='save_button')
+if save_button:
+    new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': result}
+    new_data = pd.DataFrame([new_row])
+
+    # Append new_data to existing sheet DataFrame
+    sheet1 = pd.concat([sheet1, new_data], ignore_index=True)
+
+    try:
+        # Clear and update Google Sheets with the updated sheet DataFrame
+        worksheet11.clear()
+        worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
+
+        st.write("The prediction result has been submitted and Google Sheets updated.")
+    except Exception as e:
+        st.error(f"Error updating Google Sheets: {str(e)}")
