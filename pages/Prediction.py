@@ -92,14 +92,6 @@ with col1:
 with col2:
     st.title("👩‍⚕️ HIV Treatment Status Prediction")
 
-# Initialize session state for EMR ID and Institution Name
-if 'emr_id' not in st.session_state:
-    st.session_state.emr_id = ''
-if 'inst' not in st.session_state:
-    st.session_state.inst = ''
-if 'result' not in st.session_state:
-    st.session_state.result = None
-
 # Add sidebar
 st.sidebar.title('Enter your EMR ID and institution name to match your records')
 with st.sidebar:
@@ -109,11 +101,6 @@ with st.sidebar:
     st.write("You selected:", inst)
     search_button = st.button("Search",key='search_button')
 
-
-# Update session state with current inputs
-st.session_state.emr_id = emr_id
-st.session_state.inst = inst
-   
 
 # Initialize or retrieve session state variables
 if 'patient_data' not in st.session_state:
@@ -135,6 +122,10 @@ if 'patient_data' not in st.session_state:
         'within_one_year': 'Unknown',
         'last_VL_result': 'Unknown'
     }
+
+# Initialize session state for result
+if 'result' not in st.session_state:
+    st.session_state['result'] = None
 
 # Add conditions
 if search_button:
@@ -425,17 +416,17 @@ with st.container():
 
             # Display prediction result
             if prediction == 1:
-                st.session_state.result = 'Actif'
+                st.session_state['result'] = 'Actif'
                 st.write("<div style='font-size:30px; color:#8B0000;'>Actif</div>", unsafe_allow_html=True)
             else:
-                st.session_state.result = 'PIT'
+                st.session_state['result'] = 'PIT'
                 st.write("<div style='font-size:30px; color:#8B0000;'>PIT</div>", unsafe_allow_html=True)
 
             # Save button
-            save_button = st.button('Save Results')
+            save_button = st.button('Save Results',key='save_button')
 
-            if save_button and st.session_state.result is not None:
-                new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': st.session_state.emr_id, 'Institution Name': st.session_state.inst, 'Prediction results': st.session_state.result}
+            if save_button and st.session_state['result'] is not None:
+                new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': st.session_state['result']}
                 new_data = pd.DataFrame([new_row])
 
                 # Append new_data to existing sheet DataFrame
