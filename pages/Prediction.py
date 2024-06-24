@@ -424,22 +424,23 @@ with st.container():
 
             # Save button
             save_button = st.button('Save Results',key='save_button')
+        
+        if save_button and st.session_state['result'] is not None:
+            new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': st.session_state['result']}
+            new_data = pd.DataFrame([new_row])
 
-            if save_button and st.session_state['result'] is not None:
-                new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': st.session_state['result']}
-                new_data = pd.DataFrame([new_row])
+            # Append new_data to existing sheet DataFrame
+            sheet1 = pd.concat([sheet1, new_data], ignore_index=True)
 
-                # Append new_data to existing sheet DataFrame
-                sheet1 = pd.concat([sheet1, new_data], ignore_index=True)
+            try:
+                # Clear and update Google Sheets with the updated sheet DataFrame
+                worksheet11.clear()
+                worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
 
-                try:
-                    # Clear and update Google Sheets with the updated sheet DataFrame
-                    worksheet11.clear()
-                    worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
-
-                    st.write("The prediction result has been submitted and Google Sheets updated.")
-                except Exception as e:
-                    st.error(f"Error updating Google Sheets: {str(e)}")
+                st.write("The prediction result has been submitted and Google Sheets updated.")
+            except Exception as e:
+                st.error(f"Error updating Google Sheets: {str(e)}")
 
         # Display disclaimer
         st.write("This app assists medical professionals in making a diagnosis, but should not be used as a substitute for professional diagnosis.")
+
