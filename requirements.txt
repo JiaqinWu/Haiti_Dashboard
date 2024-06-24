@@ -1,0 +1,11 @@
+streamlit
+plotly
+xgboost
+sklearn
+pickle
+millify
+streamlit_extras
+plotly
+altair
+sqlite3
+gsheetsdb==0.1.13.1
