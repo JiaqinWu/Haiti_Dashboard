@@ -379,16 +379,22 @@ def create_radar(lis1):
 
     return fig
 
-
-def display_predictions(lis1, lis2, model, scaler, predict_button, emr_id, inst, sheet):
+def display_predictions(lis1, lis2, model, scaler, emr_id, inst, sheet, worksheet1):
     # Combine continuous and categorical variables without scaling lis2
     input_array = np.array(lis1 + lis2).reshape(1, -1)
 
     # Display the prediction result
     st.subheader('Treatment Status Prediction')
 
+    # Initialize predict_button in session state if not already
+    if 'predict_button' not in st.session_state:
+        st.session_state.predict_button = False
+
     # Check if the "Predict" button is clicked
-    if predict_button:
+    if st.button("Predict", key='predict_button'):
+        st.session_state.predict_button = True
+
+    if st.session_state.predict_button:
         # Scale the continuous variables
         input_data_scaled = scaler.transform(input_array[:, :len(lis1)])
         # Combine the scaled continuous variables and categorical variables
@@ -415,16 +421,11 @@ def display_predictions(lis1, lis2, model, scaler, predict_button, emr_id, inst,
                 # Update Google Sheets with the updated sheet DataFrame
                 worksheet1.update([sheet.columns.values.tolist()] + sheet.values.tolist())
 
+                # Display updated sheet in Streamlit
                 st.write("The prediction result has been submitted and Google Sheets updated.")
+                st.write(sheet)  # Display the updated sheet DataFrame
             except Exception as e:
                 st.error(f"Error updating Google Sheets: {str(e)}")
-
-
-    else:
-        # Display an empty space
-        st.write(" " * 50)
-    
-    st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
 
 # Main content
 with st.container():
@@ -445,4 +446,4 @@ with st.container():
         st.plotly_chart(fig)
 
     with col2:
-        display_predictions(lis1, lis2, model, scaler, predict_button, emr_id, inst, sheet)
+        display_predictions(lis1, lis2, model, scaler, predict_button, emr_id, inst, sheet, worksheet1)
