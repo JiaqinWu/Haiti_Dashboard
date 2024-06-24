@@ -100,7 +100,7 @@ with st.sidebar:
                         help="Enter the institution you visit here.")
     st.write("You selected:", inst)
     search_button = st.button("Search",key='search_button')
-    save_button = st.button("Save Results", key='save_button')
+   
 
 # Initialize or retrieve session state variables
 if 'patient_data' not in st.session_state:
@@ -423,6 +423,7 @@ with st.container():
 
         st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
 
+save_button = st.sidebar.button("Save Results", key='save_button') 
 if save_button:
     new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': result}
     new_data = pd.DataFrame([new_row])
