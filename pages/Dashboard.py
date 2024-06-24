@@ -14,23 +14,23 @@ import altair as alt
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import json
+from streamlit_gsheets import GSheetsConnection
 import warnings 
 warnings.filterwarnings('ignore')
 
 image = "CGHPI.png"
-scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
+#scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
 #creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
 # Use Streamlit's secrets management
-if "gcp_service_account" in st.secrets:
-    creds_dict = st.secrets["gcp_service_account"]
-    st.write("GCP Service Account credentials loaded successfully.")
-else:
-    st.error("The key 'gcp_service_account' is missing from secrets.toml")
+#creds_dict = st.secrets["gcp_service_account"]
+#creds_json = json.dumps(creds_dict)
+#creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(creds_json), scope)
+#client = gspread.authorize(creds)
+#prediction = pd.DataFrame(client.open('Haiti EMR Prediction').worksheet('Sheet1').get_all_records())
 
-creds_json = json.dumps(creds_dict)
-creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(creds_json), scope)
-client = gspread.authorize(creds)
-prediction = pd.DataFrame(client.open('Haiti EMR Prediction').worksheet('Sheet1').get_all_records())
+# Create a connection object.
+conn = st.connection("gsheets", type=GSheetsConnection)
+df = conn.read( worksheet="Sheet1")
 
 
 #prediction = pd.read_csv("pages/Datasets/EMR_prediction.csv")
