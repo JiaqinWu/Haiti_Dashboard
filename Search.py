@@ -129,13 +129,17 @@ tab1, tab2, tab3, tab4 = st.tabs([f'{s}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;' for
 
 # Function to perform search and save results to session state
 def perform_search(emr_id, inst):
-    df1['mpi_ref'] = df1['mpi_ref'].astype(str)
-    df1['joint_id'] = df1['mpi_ref'] + '_' + df1['EMR_ID'].astype(str)
-    joint = df1[(df1['EMR_ID'] == emr_id) & (df1['INSTITUTION'] == inst)]['joint_id'].values
+    #df1['mpi_ref'] = df1['mpi_ref'].astype(str)
+    #df1['joint_id'] = df1['mpi_ref'] + '_' + df1['EMR_ID'].astype(str)
+    df4['mpi_ref'] = df4['mpi_ref'].astype(str)
+    df4['joint_id'] = df4['mpi_ref'] + '_' + df4['EMR_ID'].astype(str)
+    df_code = df3[['id_commune', 'commune']].drop_duplicates().rename(columns={'id_commune': 'id_commune_residence', 'commune': 'commune_residence'})
+    df40 = pd.merge(df4, df3, left_on='ID_INSTITUTION', right_on='id_institution', how='left')
+    df41 = pd.merge(df40, df_code, on='id_commune_residence', how='left').rename(columns={'commune': 'commune_visit'})
+    joint = df41[(df41['EMR_ID'] == emr_id) & (df41['institution'] == inst)]['joint_id'].values
 
     if len(joint) > 0:
         joint_id = joint[0]
-        # Additional processing and merge logic as needed, assuming results in df1, df4, df5, df6, etc.
         return joint_id
     else:
         return None

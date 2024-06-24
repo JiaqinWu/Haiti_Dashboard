@@ -93,21 +93,22 @@ if search_button:
     df6['joint_id'] = df6['mpi_ref'] + '_' + df6['EMR_ID'].astype(str)
     df5['mpi_ref'] = df5['mpi_ref'].astype(str)
     df5['joint_id'] = df5['mpi_ref'] + '_' + df5['EMR_ID'].astype(str)
+    df_code = df3[['id_commune', 'commune']].drop_duplicates().rename(columns={'id_commune': 'id_commune_residence', 'commune': 'commune_residence'})
+    df40 = pd.merge(df4, df3, left_on='ID_INSTITUTION', right_on='id_institution', how='left')
+    df41 = pd.merge(df40, df_code, on='id_commune_residence', how='left').rename(columns={'commune': 'commune_visit'})
 
     # Filter the joint ID
-    joint = df1[(df1['EMR_ID'] == emr_id) & (df1['INSTITUTION'] == inst)]['joint_id'].values
+    joint = df41[(df41['EMR_ID'] == emr_id) & (df41['institution'] == inst)]['joint_id'].values
+    #joint = df1[(df1['EMR_ID'] == emr_id) & (df1['INSTITUTION'] == inst)]['joint_id'].values
 
     # Check if any joint ID is found
     if len(joint) > 0:
         joint = joint[0]
 
         # Continue processing if joint ID is found
-        df4['Sexe'] = df4['Sexe'].replace({'M': 'Male', 'F': 'Female', 'U': 'Unknown'})
+        df41['Sexe'] = df41['Sexe'].replace({'M': 'Male', 'F': 'Female', 'U': 'Unknown'})
 
         # Merge data frames and process
-        df_code = df3[['id_commune', 'commune']].drop_duplicates().rename(columns={'id_commune': 'id_commune_residence', 'commune': 'commune_residence'})
-        df40 = pd.merge(df4, df3, left_on='ID_INSTITUTION', right_on='id_institution', how='left')
-        df41 = pd.merge(df40, df_code, on='id_commune_residence', how='left').rename(columns={'commune': 'commune_visit'})
         df41['date_diagnostic'] = pd.to_datetime(df41['date_diagnostic'])
         df41['same_facility'] = df41.id_commune_residence == df41.id_commune
         df1['dispd'] = pd.to_datetime(df1['dispd'])
