@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from streamlit_gsheets import GSheetsConnection
+#from streamlit_gsheets import GSheetsConnection
 from datetime import datetime, timedelta
 from millify import millify # shortens values (10_000 ---> 10k)
 from streamlit_extras.metric_cards import style_metric_cards # beautify metric card with css
