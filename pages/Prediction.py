@@ -386,14 +386,6 @@ def display_predictions(lis1, lis2, model, scaler, emr_id, inst, sheet, workshee
     # Display the prediction result
     st.subheader('Treatment Status Prediction')
 
-    # Initialize predict_button in session state if not already
-    if 'predict_button' not in st.session_state:
-        st.session_state.predict_button = False
-
-    # Check if the "Predict" button is clicked
-    if st.button("Predict", key='predict_button'):
-        st.session_state.predict_button = True
-
     if st.session_state.predict_button:
         # Scale the continuous variables
         input_data_scaled = scaler.transform(input_array[:, :len(lis1)])
