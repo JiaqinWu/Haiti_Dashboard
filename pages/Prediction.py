@@ -100,6 +100,7 @@ with st.sidebar:
                         help="Enter the institution you visit here.")
     st.write("You selected:", inst)
     search_button = st.button("Search",key='search_button')
+    save_button = st.button("Save Results", key='save_button')
 
 # Initialize or retrieve session state variables
 if 'patient_data' not in st.session_state:
@@ -351,63 +352,7 @@ res = int(recent == 'Indetectable')
 lis2 = [fem, same, tes, res]
 
 
-# Define a function to plot radar plot
-def create_radar(lis1):
-    fig = go.Figure()
 
-    # Add the traces
-    fig.add_trace(go.Scatterpolar(
-        r=lis1,  
-        theta=['Age at Diagnosis', 'Dispensation Years', 'Dispensation Days Early/Late', 'Early Percentage',
-               'On-time Percentage', 'Late Percentage', 'Avg Dispensation Gap', 'Avg Days to Next Dispensation',
-               'Years in Actif Status', 'Number of HIV Tests', 'Avg Days Between Visits'],
-        fill='toself',
-        name='Patient'
-    ))
-
-    # Update the layout
-    fig.update_layout(
-        polar=dict(
-            radialaxis=dict(
-                visible=True,
-                range=[0, max(lis1)] if predict_button else [0,100]  
-            )
-        ),
-        showlegend=True,
-        autosize=True
-    )
-
-    return fig
-
-
-# Define the function to display predictions
-def display_predictions(lis1, lis2, model, scaler):
-    # Combine continuous and categorical variables without scaling lis2
-    input_array = np.array(lis1 + lis2).reshape(1, -1)
-
-    # Display the prediction result
-    st.subheader('Treatment Status Prediction')
-
-    # Check if the "Predict" button is clicked
-    if predict_button:
-        # Scale the continuous variables
-        input_data_scaled = scaler.transform(input_array[:, :len(lis1)])
-        # Combine the scaled continuous variables and categorical variables
-        input_data_fin = np.concatenate([input_data_scaled, input_array[:, len(lis1):]], axis=1)
-        # Make predictions
-        prediction = model.predict(input_data_fin)
-
-        if prediction == 1:
-            st.write("<div style='font-size:30px; color:#8B0000;'>Actif</div>", unsafe_allow_html=True)
-        else:
-            st.write("<div style='font-size:30px; color:#8B0000;'>PIT</div>", unsafe_allow_html=True)
-        result = 'Actif' if prediction == 1 else 'PIT'
-
-    else:
-        # Display an empty space
-        st.write(" " * 50)
-
-    st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
 
 # Main content
 with st.container():
@@ -423,14 +368,61 @@ with st.container():
 
     with col1:
         st.subheader('Radar Chart for Numeric Variables')
-        fig = create_radar(lis1)
+        fig = go.Figure()
+
+        # Add the traces
+        fig.add_trace(go.Scatterpolar(
+            r=lis1,  
+            theta=['Age at Diagnosis', 'Dispensation Years', 'Dispensation Days Early/Late', 'Early Percentage',
+                'On-time Percentage', 'Late Percentage', 'Avg Dispensation Gap', 'Avg Days to Next Dispensation',
+                'Years in Actif Status', 'Number of HIV Tests', 'Avg Days Between Visits'],
+            fill='toself',
+            name='Patient'
+        ))
+
+        # Update the layout
+        fig.update_layout(
+            polar=dict(
+                radialaxis=dict(
+                    visible=True,
+                    range=[0, max(lis1)] if predict_button else [0,100]  
+                )
+            ),
+            showlegend=True,
+            autosize=True
+        )
+
         # Display the radar plot
         st.plotly_chart(fig)
 
     with col2:
-        display_predictions(lis1, lis2, model, scaler)
+        # Combine continuous and categorical variables without scaling lis2
+        input_array = np.array(lis1 + lis2).reshape(1, -1)
 
-save_button = st.sidebar.button("Save Results", key='save_button')
+        # Display the prediction result
+        st.subheader('Treatment Status Prediction')
+
+        # Check if the "Predict" button is clicked
+        if predict_button:
+            # Scale the continuous variables
+            input_data_scaled = scaler.transform(input_array[:, :len(lis1)])
+            # Combine the scaled continuous variables and categorical variables
+            input_data_fin = np.concatenate([input_data_scaled, input_array[:, len(lis1):]], axis=1)
+            # Make predictions
+            prediction = model.predict(input_data_fin)
+
+            if prediction == 1:
+                st.write("<div style='font-size:30px; color:#8B0000;'>Actif</div>", unsafe_allow_html=True)
+            else:
+                st.write("<div style='font-size:30px; color:#8B0000;'>PIT</div>", unsafe_allow_html=True)
+            result = 'Actif' if prediction == 1 else 'PIT'
+
+        else:
+            # Display an empty space
+            st.write(" " * 50)
+
+        st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
+
 if save_button:
     new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': result}
     new_data = pd.DataFrame([new_row])
@@ -443,6 +435,6 @@ if save_button:
         worksheet11.clear()
         worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
 
-        st.write("The prediction result has been submitted and Google Sheets updated.")
+        st.sidebar.write("The prediction result has been submitted and Google Sheets updated.")
     except Exception as e:
-        st.error(f"Error updating Google Sheets: {str(e)}")
+        st.sidebar.error(f"Error updating Google Sheets: {str(e)}")
