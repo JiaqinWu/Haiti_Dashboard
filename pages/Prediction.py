@@ -92,6 +92,14 @@ with col1:
 with col2:
     st.title("👩‍⚕️ HIV Treatment Status Prediction")
 
+# Initialize session state for EMR ID and Institution Name
+if 'emr_id' not in st.session_state:
+    st.session_state.emr_id = ''
+if 'inst' not in st.session_state:
+    st.session_state.inst = ''
+if 'result' not in st.session_state:
+    st.session_state.result = None
+
 # Add sidebar
 st.sidebar.title('Enter your EMR ID and institution name to match your records')
 with st.sidebar:
@@ -100,6 +108,11 @@ with st.sidebar:
                         help="Enter the institution you visit here.")
     st.write("You selected:", inst)
     search_button = st.button("Search",key='search_button')
+
+
+# Update session state with current inputs
+st.session_state.emr_id = emr_id
+st.session_state.inst = inst
    
 
 # Initialize or retrieve session state variables
@@ -352,10 +365,6 @@ tes = int(test == 'Yes')
 res = int(recent == 'Indetectable')
 lis2 = [fem, same, tes, res]
 
-# Initialize session state
-if 'result' not in st.session_state:
-    st.session_state.result = None
-
 
 # Main content
 with st.container():
@@ -426,7 +435,7 @@ with st.container():
             save_button = st.button('Save Results')
 
             if save_button and st.session_state.result is not None:
-                new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': st.session_state.result}
+                new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': st.session_state.emr_id, 'Institution Name': st.session_state.inst, 'Prediction results': st.session_state.result}
                 new_data = pd.DataFrame([new_row])
 
                 # Append new_data to existing sheet DataFrame
