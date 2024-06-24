@@ -19,7 +19,7 @@ warnings.filterwarnings('ignore')
 
 image = "CGHPI.png"
 scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+#creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
 # Use Streamlit's secrets management
 creds_dict = st.secrets["gcp_service_account"]
 #creds_json = json.dumps(creds_dict)
