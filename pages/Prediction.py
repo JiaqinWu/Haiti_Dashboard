@@ -352,7 +352,9 @@ tes = int(test == 'Yes')
 res = int(recent == 'Indetectable')
 lis2 = [fem, same, tes, res]
 
-
+# Initialize session state
+if 'result' not in st.session_state:
+    st.session_state.result = None
 
 
 # Main content
@@ -414,17 +416,17 @@ with st.container():
 
             # Display prediction result
             if prediction == 1:
-                result = 'Actif'
+                st.session_state.result = 'Actif'
                 st.write("<div style='font-size:30px; color:#8B0000;'>Actif</div>", unsafe_allow_html=True)
             else:
-                result = 'PIT'
+                st.session_state.result = 'PIT'
                 st.write("<div style='font-size:30px; color:#8B0000;'>PIT</div>", unsafe_allow_html=True)
 
             # Save button
             save_button = st.button('Save Results')
 
-            if save_button:
-                new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': 'emr_id_value', 'Institution Name': 'inst_value', 'Prediction results': result}
+            if save_button and st.session_state.result is not None:
+                new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': 'emr_id_value', 'Institution Name': 'inst_value', 'Prediction results': st.session_state.result}
                 new_data = pd.DataFrame([new_row])
 
                 # Append new_data to existing sheet DataFrame
@@ -432,8 +434,8 @@ with st.container():
 
                 try:
                     # Clear and update Google Sheets with the updated sheet DataFrame
-                    worksheet11.clear()
-                    worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
+                    worksheet.clear()
+                    worksheet.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
 
                     st.write("The prediction result has been submitted and Google Sheets updated.")
                 except Exception as e:
