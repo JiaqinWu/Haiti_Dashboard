@@ -337,6 +337,7 @@ recent = st.sidebar.selectbox('Last Viral Load Result', options=['Detectable', '
 
 # Define a button to trigger predictions
 predict_button = st.sidebar.button("Predict",key='predict_button')
+save_button = st.sidebar.button("Save Results", key='save_button') 
 
 
 # Import the scaler and model
@@ -423,7 +424,8 @@ with st.container():
 
         st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
 
-save_button = st.sidebar.button("Save Results", key='save_button') 
+
+
 if save_button:
     new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': result}
     new_data = pd.DataFrame([new_row])
