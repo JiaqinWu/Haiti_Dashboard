@@ -388,11 +388,12 @@ def display_predictions(lis1, lis2, model, scaler):
     st.subheader('Treatment Status Prediction')
 
     # Check if the "Predict" button is clicked
-    predict_button = st.session_state.get('predict_button', False)
-    if st.button("Predict", key='predict_button'):
-        st.session_state.predict_button = True
+    predict_button_key = 'predict_button'
+    if st.button("Predict", key=predict_button_key):
+        st.session_state[predict_button_key] = True
 
-    if predict_button:
+    predict_button_clicked = st.session_state.get(predict_button_key, False)
+    if predict_button_clicked:
         # Scale the continuous variables
         input_data_scaled = scaler.transform(input_array[:, :len(lis1)])
         # Combine the scaled continuous variables and categorical variables
@@ -407,8 +408,8 @@ def display_predictions(lis1, lis2, model, scaler):
         
         result = 'Actif' if prediction == 1 else 'PIT'
 
-        save_button = st.button("Save Results", key='save_button')
-        if save_button:
+        save_button_key = 'save_button'
+        if st.button("Save Results", key=save_button_key):
             try:
                 new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': result}
                 new_data = pd.DataFrame([new_row])
@@ -429,6 +430,7 @@ def display_predictions(lis1, lis2, model, scaler):
         st.write(" " * 50)
     
     st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")  
+
 
 
 # Main content
