@@ -42,33 +42,47 @@ institution = load_data("pages/Datasets/Institution_codebook.csv")
 #df5 = load_data("pages/Datasets/Dataset_TestCV_03_25_2024.csv")
 #df6 = load_data("pages/Datasets/Dataset_Visit_03_25_2024.csv")
 #institution = load_data("pages/Datasets/Institution_codebook.csv")
-
-# Load data
-#df1 = pd.read_csv("pages/Datasets/Dataset_Dispense_03_25_2024.csv")
-#df2 = pd.read_csv("pages/Datasets/Dataset_HistoricalStatus_03_25_2024.csv")
-#df3 = pd.read_csv("pages/Datasets/Dataset_Institution_03_25_2024.csv")
-#df4 = pd.read_csv("pages/Datasets/Dataset_Patientunique_03_25_2024.csv")
-#df5 = pd.read_csv("pages/Datasets/Dataset_TestCV_03_25_2024.csv")
-#df6 = pd.read_csv("pages/Datasets/Dataset_Visit_03_25_2024.csv")
 #scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
 #creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
 
-# Use Streamlit's secrets management
-#creds_dict = st.secrets["gcp_service_account"]
-#creds_json = json.dumps(creds_dict)
-#creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(creds_json), scope)
 
-#client = gspread.authorize(creds)
- 
-#df4 = pd.DataFrame(client.open('Dataset_Patient_Unique_06-28-23').get_worksheet(0).get_all_records())
-#institution = pd.read_csv("pages/Datasets/Institution_codebook.csv")
 image = "CGHPI.png"
-sheet = pd.DataFrame(columns=['Date', 'EMR ID', 'Institution Name', 'Comments'])
 
-#ssl._create_default_https_context = ssl._create_stdlib_context
-# Create a connection object.
-#conn = st.connection("gsheets", type=GSheetsConnection)
-#sheet = conn.read(spreadsheet = "https://docs.google.com/spreadsheets/d/1RgNkeB9F0PyOZsjNRc6VCRgHccRAnwQ1rWVJXC2lYXI/edit?gid=0#gid=0")
+scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
+#creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+# Use Streamlit's secrets management
+creds_dict = st.secrets["gcp_service_account"]
+# Extract individual attributes needed for ServiceAccountCredentials
+credentials = {
+    "type": creds_dict.type,
+    "project_id": creds_dict.project_id,
+    "private_key_id": creds_dict.private_key_id,
+    "private_key": creds_dict.private_key,
+    "client_email": creds_dict.client_email,
+    "client_id": creds_dict.client_id,
+    "auth_uri": creds_dict.auth_uri,
+    "token_uri": creds_dict.token_uri,
+    "auth_provider_x509_cert_url": creds_dict.auth_provider_x509_cert_url,
+    "client_x509_cert_url": creds_dict.client_x509_cert_url,
+}
+
+# Create JSON string for credentials
+creds_json = json.dumps(credentials)
+
+# Load credentials and authorize gspread
+creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(creds_json), scope)
+client = gspread.authorize(creds)
+
+# Example usage: Fetch data from Google Sheets
+try:
+    spreadsheet1 = client.open('Haiti EMR Comments')
+    worksheet1 = spreadsheet1.worksheet('Sheet1')
+    sheet = pd.DataFrame(worksheet1.get_all_records())
+    #st.write(sheet)
+except Exception as e:
+    st.error(f"Error fetching data from Google Sheets: {str(e)}")
+
+
 
 # Use columns for side-by-side layout
 col1, col2 = st.columns([1, 6])  # Adjust the width ratio as needed
@@ -109,16 +123,20 @@ with st.sidebar:
         if comment:
             # Add comment to DataFrame
             new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Comments': comment}
-            st.session_state.sheet = st.session_state.sheet.append(new_row, ignore_index=True)
-            sheet = st.session_state.sheet
-            st.write("Your comment has been submitted.")
+            sheet = sheet.append(new_row, ignore_index=True)
+            try:
+                # Update Google Sheets with the new data
+                worksheet1.update([sheet.columns.values.tolist()] + sheet.values.tolist())
+                st.write("Your comment has been submitted and Google Sheets updated.")
+            except Exception as e:
+                st.error(f"Error updating Google Sheets: {str(e)}")
         else:
             st.write("Please enter a comment before submitting.")
 
     # Download the comments as a CSV file
     st.download_button(
         label="Download Comments as CSV",
-        data=st.session_state.sheet.to_csv(index=False).encode('utf-8'),
+        data=sheet.to_csv(index=False).encode('utf-8'),
         file_name='comments.csv',
         mime='text/csv'
     )
