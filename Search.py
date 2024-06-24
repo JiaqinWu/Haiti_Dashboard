@@ -121,11 +121,18 @@ with st.sidebar:
 
     if submit_comment:
         if comment:
-            # Add comment to DataFrame
+            # Create a new DataFrame with the new comment
             new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Comments': comment}
-            sheet = sheet.append(new_row, ignore_index=True)
+            new_data = pd.DataFrame([new_row])
+
+            # Append new_data to sheet (assuming sheet is already populated)
+            sheet = pd.concat([sheet, new_data], ignore_index=True)
+
             try:
-                # Update Google Sheets with the new data
+                # Clear existing data in worksheet
+                worksheet1.clear()
+                
+                # Update Google Sheets with the updated sheet DataFrame
                 worksheet1.update([sheet.columns.values.tolist()] + sheet.values.tolist())
                 st.write("Your comment has been submitted and Google Sheets updated.")
             except Exception as e:
