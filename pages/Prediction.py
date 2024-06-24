@@ -380,6 +380,7 @@ def create_radar(lis1):
     return fig
 
 
+# Define the function to display predictions
 def display_predictions(lis1, lis2, model, scaler):
     # Combine continuous and categorical variables without scaling lis2
     input_array = np.array(lis1 + lis2).reshape(1, -1)
@@ -411,8 +412,8 @@ def display_predictions(lis1, lis2, model, scaler):
             sheet1 = pd.concat([sheet1, new_data], ignore_index=True)
 
             try:
+                # Clear and update Google Sheets with the updated sheet DataFrame
                 worksheet11.clear()
-                # Update Google Sheets with the updated sheet DataFrame
                 worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
 
                 st.write("The prediction result has been submitted and Google Sheets updated.")
@@ -422,10 +423,8 @@ def display_predictions(lis1, lis2, model, scaler):
     else:
         # Display an empty space
         st.write(" " * 50)
-    
+
     st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
-
-
 
 # Main content
 with st.container():
