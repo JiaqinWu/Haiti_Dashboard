@@ -434,8 +434,8 @@ with st.container():
 
                 try:
                     # Clear and update Google Sheets with the updated sheet DataFrame
-                    worksheet.clear()
-                    worksheet.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
+                    worksheet11.clear()
+                    worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
 
                     st.write("The prediction result has been submitted and Google Sheets updated.")
                 except Exception as e:
