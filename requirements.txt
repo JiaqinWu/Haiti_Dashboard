@@ -6,6 +6,5 @@ streamlit_extras
 plotly
 altair
 gsheetsdb==0.1.13.1
-streamlit_gsheets==1.2.3
 gspread
 oauth2client
