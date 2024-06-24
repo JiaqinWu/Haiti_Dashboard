@@ -445,4 +445,4 @@ with st.container():
         st.plotly_chart(fig)
 
     with col2:
-        display_predictions(lis1, lis2, model, scaler)
+        display_predictions(lis1, lis2, model, scaler, predict_button, emr_id, inst, sheet)
