@@ -399,9 +399,6 @@ with st.container():
     with col2:
         st.subheader('Treatment Status Prediction')
 
-        # Prediction button
-        predict_button = st.button('Predict')
-
         if predict_button:
             # Combine continuous and categorical variables without scaling 'lis2'
             input_array = np.array(lis1 + lis2).reshape(1, -1)
