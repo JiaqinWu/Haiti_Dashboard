@@ -426,7 +426,7 @@ with st.container():
             save_button = st.button('Save Results')
 
             if save_button and st.session_state.result is not None:
-                new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': 'emr_id_value', 'Institution Name': 'inst_value', 'Prediction results': st.session_state.result}
+                new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': st.session_state.result}
                 new_data = pd.DataFrame([new_row])
 
                 # Append new_data to existing sheet DataFrame
