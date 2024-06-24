@@ -21,7 +21,12 @@ image = "CGHPI.png"
 scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
 #creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
 # Use Streamlit's secrets management
-creds_dict = st.secrets["gcp_service_account"]
+if "gcp_service_account" in st.secrets:
+    creds_dict = st.secrets["gcp_service_account"]
+    st.write("GCP Service Account credentials loaded successfully.")
+else:
+    st.error("The key 'gcp_service_account' is missing from secrets.toml")
+
 creds_json = json.dumps(creds_dict)
 creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(creds_json), scope)
 client = gspread.authorize(creds)
