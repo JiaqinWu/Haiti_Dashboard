@@ -395,52 +395,52 @@ with st.container():
 
         # Display the radar plot
         st.plotly_chart(fig)
+        
+    with col2:
+        st.subheader('Treatment Status Prediction')
 
-    # Prediction and saving logic
-if predict_button:
-    # Combine continuous and categorical variables without scaling lis2
-    input_array = np.array(lis1 + lis2).reshape(1, -1)
+        # Prediction button
+        predict_button = st.button('Predict')
 
-    # Check if the "Predict" button is clicked
-    if predict_button:
-        # Scale the continuous variables
-        input_data_scaled = scaler.transform(input_array[:, :len(lis1)])
-        # Combine the scaled continuous variables and categorical variables
-        input_data_fin = np.concatenate([input_data_scaled, input_array[:, len(lis1):]], axis=1)
-        # Make predictions
-        prediction = model.predict(input_data_fin)
+        if predict_button:
+            # Combine continuous and categorical variables without scaling 'lis2'
+            input_array = np.array(lis1 + lis2).reshape(1, -1)
 
-        if prediction == 1:
-            st.write("<div style='font-size:30px; color:#8B0000;'>Actif</div>", unsafe_allow_html=True)
-        else:
-            st.write("<div style='font-size:30px; color:#8B0000;'>PIT</div>", unsafe_allow_html=True)
-        result = 'Actif' if prediction == 1 else 'PIT'
+            # Scale the continuous variables
+            input_data_scaled = scaler.transform(input_array[:, :len(lis1)])
 
-    else:
-        # Display an empty space
-        st.write(" " * 50)
+            # Combine the scaled continuous variables and categorical variables
+            input_data_fin = np.concatenate([input_data_scaled, input_array[:, len(lis1):]], axis=1)
 
-    st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
+            # Make predictions
+            prediction = model.predict(input_data_fin)
 
-    # Dummy save button
-    save_button = st.button('Save Results', key='save_button') 
+            # Display prediction result
+            if prediction == 1:
+                result = 'Actif'
+                st.write("<div style='font-size:30px; color:#8B0000;'>Actif</div>", unsafe_allow_html=True)
+            else:
+                result = 'PIT'
+                st.write("<div style='font-size:30px; color:#8B0000;'>PIT</div>", unsafe_allow_html=True)
 
-    if save_button:
-        new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': result}
-        new_data = pd.DataFrame([new_row])
+            # Save button
+            save_button = st.button('Save Results')
 
-        # Append new_data to existing sheet DataFrame
-        sheet1 = pd.concat([sheet1, new_data], ignore_index=True)
+            if save_button:
+                new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': 'emr_id_value', 'Institution Name': 'inst_value', 'Prediction results': result}
+                new_data = pd.DataFrame([new_row])
 
-        try:
-            # Clear and update Google Sheets with the updated sheet DataFrame
-            worksheet11.clear()
-            worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
+                # Append new_data to existing sheet DataFrame
+                sheet1 = pd.concat([sheet1, new_data], ignore_index=True)
 
-            st.write("The prediction result has been submitted and Google Sheets updated.")
-        except Exception as e:
-            st.error(f"Error updating Google Sheets: {str(e)}")
+                try:
+                    # Clear and update Google Sheets with the updated sheet DataFrame
+                    worksheet11.clear()
+                    worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
 
+                    st.write("The prediction result has been submitted and Google Sheets updated.")
+                except Exception as e:
+                    st.error(f"Error updating Google Sheets: {str(e)}")
 
-# Display disclaimer
-st.sidebar.markdown("This app assists medical professionals in making a diagnosis, but should not be used as a substitute for professional diagnosis.")
+        # Display disclaimer
+        st.write("This app assists medical professionals in making a diagnosis, but should not be used as a substitute for professional diagnosis.")
