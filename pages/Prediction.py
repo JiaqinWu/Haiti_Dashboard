@@ -7,6 +7,9 @@ from datetime import datetime, timedelta
 import xgboost as xgb
 import plotly.graph_objects as go
 import warnings 
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import json
 warnings.filterwarnings('ignore')
 
 
@@ -38,6 +41,45 @@ institution = load_data("pages/Datasets/Institution_codebook.csv")
 #df6 = load_data("pages/Datasets/Dataset_Visit_03_25_2024.csv")
 #institution = load_data("pages/Datasets/Institution_codebook.csv")
 
+
+scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
+#creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+# Use Streamlit's secrets management
+creds_dict = st.secrets["gcp_service_account"]
+#creds_json = json.dumps(creds_dict)
+#creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(creds_json), scope)
+#client = gspread.authorize(creds)
+#prediction = pd.DataFrame(client.open('Haiti EMR Prediction').worksheet('Sheet1').get_all_records())
+
+# Extract individual attributes needed for ServiceAccountCredentials
+credentials = {
+    "type": creds_dict.type,
+    "project_id": creds_dict.project_id,
+    "private_key_id": creds_dict.private_key_id,
+    "private_key": creds_dict.private_key,
+    "client_email": creds_dict.client_email,
+    "client_id": creds_dict.client_id,
+    "auth_uri": creds_dict.auth_uri,
+    "token_uri": creds_dict.token_uri,
+    "auth_provider_x509_cert_url": creds_dict.auth_provider_x509_cert_url,
+    "client_x509_cert_url": creds_dict.client_x509_cert_url,
+}
+
+# Create JSON string for credentials
+creds_json = json.dumps(credentials)
+
+# Load credentials and authorize gspread
+creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(creds_json), scope)
+client = gspread.authorize(creds)
+
+# Example usage: Fetch data from Google Sheets
+try:
+    spreadsheet = client.open('Haiti EMR Prediction')
+    worksheet1 = spreadsheet.worksheet('Sheet1')
+    sheet = pd.DataFrame(worksheet1.get_all_records())
+    #st.write(prediction)
+except Exception as e:
+    st.error(f"Error fetching data from Google Sheets: {str(e)}")
 
 
 # Use columns for side-by-side layout
@@ -338,7 +380,7 @@ def create_radar(lis1):
     return fig
 
 
-def display_predictions(lis1, lis2, model, scaler):
+def display_predictions(lis1, lis2, model, scaler, predict_button, emr_id, inst, sheet):
     # Combine continuous and categorical variables without scaling lis2
     input_array = np.array(lis1 + lis2).reshape(1, -1)
 
@@ -358,6 +400,25 @@ def display_predictions(lis1, lis2, model, scaler):
             st.write("<div style='font-size:30px; color:#8B0000;'>Actif</div>", unsafe_allow_html=True)
         else:
             st.write("<div style='font-size:30px; color:#8B0000;'>PIT</div>", unsafe_allow_html=True)
+        
+        save_button = st.button("Save Results", key='save_button')
+        if save_button:
+            try:
+                # Create a new DataFrame with the prediction result
+                result = 'Actif' if prediction == 1 else 'PIT'
+                new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': result}
+                new_data = pd.DataFrame([new_row])
+
+                # Append new_data to existing sheet DataFrame
+                sheet = pd.concat([sheet, new_data], ignore_index=True)
+
+                # Update Google Sheets with the updated sheet DataFrame
+                worksheet1.update([sheet.columns.values.tolist()] + sheet.values.tolist())
+
+                st.write("The prediction result has been submitted and Google Sheets updated.")
+            except Exception as e:
+                st.error(f"Error updating Google Sheets: {str(e)}")
+
 
     else:
         # Display an empty space
