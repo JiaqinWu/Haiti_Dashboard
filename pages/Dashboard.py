@@ -17,6 +17,9 @@ import json
 import warnings 
 warnings.filterwarnings('ignore')
 
+# Main page content
+st.set_page_config(page_title = 'Haiti Prediction Dashboard', page_icon='🧑‍⚕️',layout='wide')
+
 image = "CGHPI.png"
 scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
 #creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
@@ -53,15 +56,12 @@ try:
     spreadsheet = client.open('Haiti EMR Prediction')
     worksheet = spreadsheet.worksheet('Sheet1')
     prediction = pd.DataFrame(worksheet.get_all_records())
-    st.write(prediction)
+    #st.write(prediction)
 except Exception as e:
     st.error(f"Error fetching data from Google Sheets: {str(e)}")
 
 #prediction = pd.read_csv("pages/Datasets/EMR_prediction.csv")
 
-
-# Main page content
-st.set_page_config(page_title = 'Haiti Prediction Dashboard', page_icon='🧑‍⚕️',layout='wide')
 
 # Use columns for side-by-side layout
 col1, col2 = st.columns([1, 6])  # Adjust the width ratio as needed
