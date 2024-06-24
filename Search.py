@@ -130,7 +130,7 @@ with st.sidebar:
 
             try:
                 # Clear existing data in worksheet
-                #worksheet1.clear()
+                worksheet1.clear()
                 
                 # Update Google Sheets with the updated sheet DataFrame
                 worksheet1.update([sheet.columns.values.tolist()] + sheet.values.tolist())

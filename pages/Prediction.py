@@ -74,9 +74,9 @@ client = gspread.authorize(creds)
 
 # Example usage: Fetch data from Google Sheets
 try:
-    spreadsheet = client.open('Haiti EMR Prediction')
-    worksheet1 = spreadsheet.worksheet('Sheet1')
-    sheet = pd.DataFrame(worksheet1.get_all_records())
+    spreadsheet11 = client.open('Haiti EMR Prediction')
+    worksheet11 = spreadsheet11.worksheet('Sheet1')
+    sheet1 = pd.DataFrame(worksheet11.get_all_records())
     #st.write(prediction)
 except Exception as e:
     st.error(f"Error fetching data from Google Sheets: {str(e)}")
@@ -379,14 +379,15 @@ def create_radar(lis1):
 
     return fig
 
-def display_predictions(lis1, lis2, model, scaler, emr_id, inst, sheet, worksheet1):
+def display_predictions(lis1, lis2, model, scaler):
     # Combine continuous and categorical variables without scaling lis2
     input_array = np.array(lis1 + lis2).reshape(1, -1)
 
     # Display the prediction result
     st.subheader('Treatment Status Prediction')
 
-    if st.session_state.predict_button:
+    # Check if the "Predict" button is clicked
+    if predict_button:
         # Scale the continuous variables
         input_data_scaled = scaler.transform(input_array[:, :len(lis1)])
         # Combine the scaled continuous variables and categorical variables
@@ -398,26 +399,30 @@ def display_predictions(lis1, lis2, model, scaler, emr_id, inst, sheet, workshee
             st.write("<div style='font-size:30px; color:#8B0000;'>Actif</div>", unsafe_allow_html=True)
         else:
             st.write("<div style='font-size:30px; color:#8B0000;'>PIT</div>", unsafe_allow_html=True)
-        
+        result = 'Actif' if prediction == 1 else 'PIT'
+
         save_button = st.button("Save Results", key='save_button')
         if save_button:
+            new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': result}
+            new_data = pd.DataFrame([new_row])
+
+            # Append new_data to existing sheet DataFrame
+            sheet1 = pd.concat([sheet1, new_data], ignore_index=True)
+
             try:
-                # Create a new DataFrame with the prediction result
-                result = 'Actif' if prediction == 1 else 'PIT'
-                new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': result}
-                new_data = pd.DataFrame([new_row])
-
-                # Append new_data to existing sheet DataFrame
-                sheet = pd.concat([sheet, new_data], ignore_index=True)
-
+                worksheet11.clear()
                 # Update Google Sheets with the updated sheet DataFrame
-                worksheet1.update([sheet.columns.values.tolist()] + sheet.values.tolist())
+                worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
 
-                # Display updated sheet in Streamlit
                 st.write("The prediction result has been submitted and Google Sheets updated.")
-                st.write(sheet)  # Display the updated sheet DataFrame
             except Exception as e:
                 st.error(f"Error updating Google Sheets: {str(e)}")
+
+    else:
+        # Display an empty space
+        st.write(" " * 50)
+    
+    st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
 
 # Main content
 with st.container():
@@ -438,4 +443,4 @@ with st.container():
         st.plotly_chart(fig)
 
     with col2:
-        display_predictions(lis1, lis2, model, scaler, emr_id, inst, sheet, worksheet1)
+        display_predictions(lis1, lis2, model, scaler)
