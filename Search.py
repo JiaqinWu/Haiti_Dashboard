@@ -9,8 +9,8 @@ from streamlit_extras.metric_cards import style_metric_cards # beautify metric c
 import plotly.graph_objects as go
 import altair as alt 
 #import seaborn as sns
-import plotnine
-from plotnine import *
+#import plotnine
+#from plotnine import *
 import warnings 
 warnings.filterwarnings('ignore')
 
