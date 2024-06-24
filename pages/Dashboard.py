@@ -11,11 +11,24 @@ import altair as alt
 #import seaborn as sns
 #import plotnine
 #from plotnine import *
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import json
 import warnings 
 warnings.filterwarnings('ignore')
 
 image = "CGHPI.png"
-prediction = pd.read_csv("pages/Datasets/EMR_prediction.csv")
+scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+# Use Streamlit's secrets management
+#creds_dict = st.secrets["gcp_service_account"]
+#creds_json = json.dumps(creds_dict)
+#creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(creds_json), scope)
+client = gspread.authorize(creds)
+prediction = pd.DataFrame(client.open('Haiti EMR Prediction').worksheet('Sheet1').get_all_records())
+
+
+#prediction = pd.read_csv("pages/Datasets/EMR_prediction.csv")
 
 
 # Main page content

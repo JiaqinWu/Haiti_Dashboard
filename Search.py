@@ -57,6 +57,7 @@ institution = load_data("pages/Datasets/Institution_codebook.csv")
 #creds_dict = st.secrets["gcp_service_account"]
 #creds_json = json.dumps(creds_dict)
 #creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(creds_json), scope)
+
 #client = gspread.authorize(creds)
  
 #df4 = pd.DataFrame(client.open('Dataset_Patient_Unique_06-28-23').get_worksheet(0).get_all_records())
