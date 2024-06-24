@@ -380,24 +380,19 @@ def create_radar(lis1):
     return fig
 
 
-def display_predictions(lis1, lis2, model, scaler, emr_id, inst):
-    global sheet1  # Use global to persist changes across function calls
-
+def display_predictions(lis1, lis2, model, scaler):
     # Combine continuous and categorical variables without scaling lis2
     input_array = np.array(lis1 + lis2).reshape(1, -1)
 
     # Display the prediction result
     st.subheader('Treatment Status Prediction')
 
-    # Initialize predict_button in session state if not already
-    if 'predict_button' not in st.session_state:
-        st.session_state.predict_button = False
-
     # Check if the "Predict" button is clicked
+    predict_button = st.session_state.get('predict_button', False)
     if st.button("Predict", key='predict_button'):
         st.session_state.predict_button = True
 
-    if st.session_state.predict_button:
+    if predict_button:
         # Scale the continuous variables
         input_data_scaled = scaler.transform(input_array[:, :len(lis1)])
         # Combine the scaled continuous variables and categorical variables
@@ -409,26 +404,23 @@ def display_predictions(lis1, lis2, model, scaler, emr_id, inst):
             st.write("<div style='font-size:30px; color:#8B0000;'>Actif</div>", unsafe_allow_html=True)
         else:
             st.write("<div style='font-size:30px; color:#8B0000;'>PIT</div>", unsafe_allow_html=True)
+        
         result = 'Actif' if prediction == 1 else 'PIT'
 
         save_button = st.button("Save Results", key='save_button')
         if save_button:
             try:
-                # Create a new DataFrame with the prediction result
                 new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution Name': inst, 'Prediction results': result}
                 new_data = pd.DataFrame([new_row])
 
                 # Append new_data to existing sheet DataFrame
                 sheet1 = pd.concat([sheet1, new_data], ignore_index=True)
 
-                # Clear existing data in worksheet
+                # Clear existing data in worksheet and update Google Sheets with the updated sheet DataFrame
                 worksheet11.clear()
-
-                # Update Google Sheets with the updated sheet DataFrame
                 worksheet11.update([sheet1.columns.values.tolist()] + sheet1.values.tolist())
 
                 st.write("The prediction result has been submitted and Google Sheets updated.")
-                st.write(sheet1)  # Display the updated sheet DataFrame
             except Exception as e:
                 st.error(f"Error updating Google Sheets: {str(e)}")
 
@@ -436,7 +428,8 @@ def display_predictions(lis1, lis2, model, scaler, emr_id, inst):
         # Display an empty space
         st.write(" " * 50)
     
-    st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")
+    st.write("This app can assist medical professionals in making a diagnosis, but should not be used as a substitute for a professional diagnosis.")  
+
 
 # Main content
 with st.container():
@@ -457,4 +450,4 @@ with st.container():
         st.plotly_chart(fig)
 
     with col2:
-        display_predictions(lis1, lis2, model, scaler, emr_id, inst)
+        display_predictions(lis1, lis2, model, scaler)
