@@ -1,9 +1,8 @@
-# 📊 Data evaluation template
+# 🇭🇹 Haiti Dashboard
 
-A simple Streamlit app showing how to evaluate and annotate data, using dataframes
-and charts. 
+This dashboard is composed of three distinct sub-tabs, each designed to serve specific functions. The first tab is dedicated to accessing the clinical historical records of HIV patients in Haiti, allowing stakeholders to review past medical data crucial for informed decision-making. The second tab utilizes the gathered data to predict the outcomes of HIV treatment over the next 28 days, offering valuable foresight into patient care strategies. Lastly, the third tab provides a daily overview of prediction usage by each institution in Haiti. This feature enables stakeholders to monitor the application's utilization and identify patients who are potentially in the Preliminary Intervention Threshold (PIT), ensuring timely and targeted medical interventions.
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://data-evaluation-template.streamlit.app/)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://haitidashboard-cghpi.streamlit.app/)
 
 ### How to run it on your own machine
 
