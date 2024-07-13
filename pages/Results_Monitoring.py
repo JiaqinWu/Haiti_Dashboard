@@ -18,7 +18,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Main page content
-st.set_page_config(page_title = 'Haiti Prediction Dashboard', page_icon='🧑‍⚕️',layout='wide')
+st.set_page_config(page_title = 'Haiti Prediction Dashboard', page_icon='🇭🇹',layout='wide')
 
 image = "CGHPI.png"
 scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets', "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
@@ -64,11 +64,11 @@ except Exception as e:
 
 
 # Use columns for side-by-side layout
-col1, col2 = st.columns([1, 6])  # Adjust the width ratio as needed
+col1, col2 = st.columns([1, 3])  # Adjust the width ratio as needed
 
 # Place the image and title in the columns
 with col1:
-    st.image(image, width=130)
+    st.image(image, width=230)
 
 with col2:
     st.title('🧑‍⚕️ Haiti Prediction Dashboard')
