@@ -415,19 +415,19 @@ with st.container():
             prediction_proba = model.predict_proba(input_data_fin)
             
             # Prediction_proba returns an array of shape [n_samples, n_classes] with probabilities
-            pit_probability = prediction_proba[0, 0]*100  # Probability of PIT
+            pit_probability = round(prediction_proba[0, 0]*100,2)  # Probability of PIT
             
             # Display the probability of PIT status
-            st.write(f"<div style='font-size:30px; color:#8B0000;'>{pit_probability:.2f}%</div>", unsafe_allow_html=True)
+            st.write(f"<div style='font-size:30px; color:#8B0000;'>{pit_probability}%</div>", unsafe_allow_html=True)
 
-            # Optionally, set the session state or handle further logic based on the probability
+            # Set the session state or handle further logic based on the probability
             st.session_state['pit_probability'] = pit_probability
 
         # Display disclaimer
         st.write("This app assists medical professionals in making a diagnosis, but should not be used as a substitute for professional diagnosis.")
 
         
-if save_button and st.session_state['result'] is not None:
+if save_button and st.session_state['pit_probability'] is not None:
     new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution name': inst, 'Probability': st.session_state['pit_probability']}
     new_data = pd.DataFrame([new_row])
 
