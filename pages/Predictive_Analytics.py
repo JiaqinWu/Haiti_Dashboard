@@ -411,16 +411,17 @@ with st.container():
             # Combine the scaled continuous variables and categorical variables
             input_data_fin = np.concatenate([input_data_scaled, input_array[:, len(lis1):]], axis=1)
 
-            # Make predictions
-            prediction = model.predict(input_data_fin)
+            # Make predictions using the predict_proba method for probabilities
+            prediction_proba = model.predict_proba(input_data_fin)
+            
+            # Prediction_proba returns an array of shape [n_samples, n_classes] with probabilities
+            pit_probability = prediction_proba[0, 0]  # Probability of PIT
+            
+            # Display the probability of PIT status
+            st.write(f"<div style='font-size:30px; color:#8B0000;'>Probability of PIT: {pit_probability:.2f}</div>", unsafe_allow_html=True)
 
-            # Display prediction result
-            if prediction == 1:
-                st.session_state['result'] = 'Actif'
-                st.write("<div style='font-size:30px; color:#8B0000;'>Actif</div>", unsafe_allow_html=True)
-            else:
-                st.session_state['result'] = 'PIT'
-                st.write("<div style='font-size:30px; color:#8B0000;'>PIT</div>", unsafe_allow_html=True)
+            # Optionally, set the session state or handle further logic based on the probability
+            st.session_state['pit_probability'] = pit_probability
 
         # Display disclaimer
         st.write("This app assists medical professionals in making a diagnosis, but should not be used as a substitute for professional diagnosis.")
