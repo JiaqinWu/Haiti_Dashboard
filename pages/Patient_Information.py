@@ -151,7 +151,7 @@ with st.sidebar:
 
 # Create five new tabs with centered labels
 listTabs = ['😷 Patient', '💊 Dispensation', '🏥 Visit', '🥼 Diagnostics' ]
-tab1, tab2, tab3, tab4 = st.tabs([f'{s}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;' for s in listTabs])
+tab1, tab2, tab3, tab4 = st.tabs([f'{s}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;' for s in listTabs])
 
 # Function to perform search and save results to session state
 def perform_search(emr_id, inst):
