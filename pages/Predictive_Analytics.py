@@ -399,7 +399,7 @@ with st.container():
         st.plotly_chart(fig)
         
     with col2:
-        st.subheader('Treatment Status Prediction')
+        st.subheader('Probability of PIT')
 
         if predict_button:
             # Combine continuous and categorical variables without scaling 'lis2'
@@ -415,10 +415,10 @@ with st.container():
             prediction_proba = model.predict_proba(input_data_fin)
             
             # Prediction_proba returns an array of shape [n_samples, n_classes] with probabilities
-            pit_probability = prediction_proba[0, 0]  # Probability of PIT
+            pit_probability = prediction_proba[0, 0]*100  # Probability of PIT
             
             # Display the probability of PIT status
-            st.write(f"<div style='font-size:30px; color:#8B0000;'>Probability of PIT: {pit_probability:.2f}</div>", unsafe_allow_html=True)
+            st.write(f"<div style='font-size:30px; color:#8B0000;'>{pit_probability:.2f}%</div>", unsafe_allow_html=True)
 
             # Optionally, set the session state or handle further logic based on the probability
             st.session_state['pit_probability'] = pit_probability
