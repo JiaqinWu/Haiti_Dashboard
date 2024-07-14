@@ -399,7 +399,7 @@ with st.container():
         st.plotly_chart(fig)
         
     with col2:
-        st.subheader('Probability of PIT')
+        st.subheader('Probability of PIT for next 28 days:')
 
         if predict_button:
             # Combine continuous and categorical variables without scaling 'lis2'
@@ -428,7 +428,7 @@ with st.container():
 
         
 if save_button and st.session_state['result'] is not None:
-    new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution name': inst, 'Prediction results': st.session_state['result']}
+    new_row = {'Date': datetime.now().strftime('%Y-%m-%d'), 'EMR ID': emr_id, 'Institution name': inst, 'Probability': st.session_state['pit_probability']}
     new_data = pd.DataFrame([new_row])
 
     # Append new_data to existing sheet DataFrame

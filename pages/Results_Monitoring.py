@@ -60,6 +60,8 @@ try:
 except Exception as e:
     st.error(f"Error fetching data from Google Sheets: {str(e)}")
 
+prediction['Prediction results'] = ['Actif' if prob < 0.5 else 'PIT' for prob in prediction['probabilities']]
+
 #prediction = pd.read_csv("pages/Datasets/EMR_prediction.csv")
 
 
