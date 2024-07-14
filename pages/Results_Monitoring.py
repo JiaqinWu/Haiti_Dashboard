@@ -216,7 +216,10 @@ with dash_5:
                 x=alt.X('sum(Number):Q', title='Number of Patients'),  # Rename x-axis
                 y=alt.Y('Institution:N', sort='-x', title='Institution Name')  # Rename y-axis 
             )
-        chart = chart.properties(title="Number of Patients in Top 10 Institution" )
+        chart = chart.properties(
+                width=600,  # Adjust width if necessary
+                height=300,  # Adjust height if necessary
+                title="Number of Patients in Top 10 Institution" )
 
         st.altair_chart(chart,use_container_width=True)
     
@@ -225,7 +228,10 @@ with dash_5:
                 x=alt.X('sum(Number):Q', title='Number of Patients'),  # Rename x-axis
                 y=alt.Y('Institution:N', sort='-x', title='Institution Name')  # Rename y-axis 
             )
-        chart = chart.properties(title="Number of PIT Patients in Top 10 Institution" )
+        chart = chart.properties(
+                width=600,  # Adjust width if necessary
+                height=300,  # Adjust height if necessary
+                title="Number of PIT Patients in Top 10 Institution" )
 
         st.altair_chart(chart,use_container_width=True)
 
@@ -250,7 +256,10 @@ with dash_6:
                 x=alt.X('sum(Number):Q', title='Number of Patients'),  # Rename x-axis
                 y=alt.Y('Institution:N', sort='-x', title='Institution Name')  # Rename y-axis 
             )
-        chart = chart.properties(title="Number of Patients with Probability >90% in Top 10 Institution from previous week data" )
+        chart = chart.properties(
+                width=600,  # Adjust width if necessary
+                height=300,  # Adjust height if necessary
+                title="Number of Patients with Probability >90% in Top 10 Institution from previous week data" )
 
         st.altair_chart(chart,use_container_width=True)
     
@@ -259,7 +268,10 @@ with dash_6:
                 x=alt.X('sum(Number):Q', title='Number of Patients'),  # Rename x-axis
                 y=alt.Y('Institution:N', sort='-x', title='Institution Name')  # Rename y-axis 
             )
-        chart = chart.properties(title="Number of Patients with Probability >80% in Top 10 Institution from previous week data" )
+        chart = chart.properties(
+                width=600,  # Adjust width if necessary
+                height=300,  # Adjust height if necessary
+                title="Number of Patients with Probability >80% in Top 10 Institution from previous week data" )
 
         st.altair_chart(chart,use_container_width=True)
 
@@ -283,13 +295,16 @@ with dash_7:
                 x=alt.X('sum(Number):Q', title='Number of Patients'),  # Rename x-axis
                 y=alt.Y('Institution:N', sort='-x', title='Institution Name')  # Rename y-axis 
             )
-        chart = chart.properties(title="Number of Patients with Probability >70% in Top 10 Institution from previous week data" )
+        chart = chart.properties(
+                width=600,  # Adjust width if necessary
+                height=300,  # Adjust height if necessary
+                title="Number of Patients with Probability >70% in Top 10 Institution from previous week data" )
 
         st.altair_chart(chart,use_container_width=True)
     
     with col2:
         chart = alt.Chart(prediction5).mark_bar(opacity=0.9,color="#9FC131").encode(
-                x=alt.X('Probability:N', title='Probability', scale=alt.Scale(domain=[0, 100])),  # Rename x-axis
+                x=alt.X('Probability:Q', title='Probability', scale=alt.Scale(domain=[0, 100])),  # Rename x-axis
                 y=alt.Y('EMR_ID:N', sort='-x', title='EMR ID')  # Rename y-axis 
             )
         chart = chart.properties(
