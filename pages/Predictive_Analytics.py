@@ -418,7 +418,7 @@ with st.container():
             pit_probability = prediction_proba[0, 0]*100  # Probability of PIT
             
             # Display the probability of PIT status
-            st.write(f"<div style='font-size:30px; color:#8B0000;'>{pit_probability:2f}%</div>", unsafe_allow_html=True)
+            st.write(f"<div style='font-size:30px; color:#8B0000;'>{pit_probability:.2f}%</div>", unsafe_allow_html=True)
 
             # Set the session state or handle further logic based on the probability
             st.session_state['pit_probability'] = round(pit_probability,2)
