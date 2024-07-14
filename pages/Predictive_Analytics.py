@@ -415,13 +415,13 @@ with st.container():
             prediction_proba = model.predict_proba(input_data_fin)
             
             # Prediction_proba returns an array of shape [n_samples, n_classes] with probabilities
-            pit_probability = round(prediction_proba[0, 0]*100,2)  # Probability of PIT
+            pit_probability = prediction_proba[0, 0]*100  # Probability of PIT
             
             # Display the probability of PIT status
-            st.write(f"<div style='font-size:30px; color:#8B0000;'>{pit_probability}%</div>", unsafe_allow_html=True)
+            st.write(f"<div style='font-size:30px; color:#8B0000;'>{pit_probability:2f}%</div>", unsafe_allow_html=True)
 
             # Set the session state or handle further logic based on the probability
-            st.session_state['pit_probability'] = pit_probability
+            st.session_state['pit_probability'] = round(pit_probability,2)
 
         # Display disclaimer
         st.write("This app assists medical professionals in making a diagnosis, but should not be used as a substitute for professional diagnosis.")
