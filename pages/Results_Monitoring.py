@@ -60,6 +60,7 @@ try:
 except Exception as e:
     st.error(f"Error fetching data from Google Sheets: {str(e)}")
 
+prediction['Probability'] = round(prediction['Probability'],2)
 prediction['Prediction results'] = ['Actif' if prob < 0.5 else 'PIT' for prob in prediction['Probability']]
 
 #prediction = pd.read_csv("pages/Datasets/EMR_prediction.csv")
@@ -75,11 +76,18 @@ with col1:
 with col2:
     st.title('🧑‍⚕️ Haiti Prediction Dashboard')
 
-"""
-Please use this tab to track the latest treatment status prediction results!
-"""
 
 # Prediction tab
+dash_0 = st.container()
+
+with dash_0:
+    st.title("About the Tab")
+    st.write("We classify patients into 'Actif' and 'PIT' categories based on the predicted probability of falling into PIT status within the next 28 days. \
+             Patients with a probability less than 0.5 are labeled as 'Actif'; those with a probability of 0.5 or higher are deemed 'PIT'. \
+             Additionally, we provide various metrics and visualizations to assist healthcare providers in monitoring the usage of the dashboard, \
+             organized by day and institution. Please utilize this tab to stay updated with the latest predictions on treatment status.")
+
+
 # creates the container for metric card
 dash_1 = st.container()
 
@@ -124,6 +132,28 @@ with dash_2:
     col2.metric(label="Yesterday's Number", value= millify(yesterday_ppl, precision=2))
 
     col3.metric(label="Last Week's Number", value= millify(lastweek_ppl, precision=2))
+
+    # this is used to style the metric card
+    style_metric_cards(border_left_color="#DBF227")
+
+# creates the container for metric card
+dash_2_1 = st.container()
+
+with dash_2_1:
+    st.write("All the data is from last week's data!")
+    # Get Description data
+    prediction1 = prediction[prediction['Date'] == last_week]
+    p90 = prediction1[prediction1['Probability']>90].count()
+    p80 = prediction1[prediction1['Probability']>80].count()
+    p70 = prediction1[prediction1['Probability']>70].count()
+
+    col1, col2, col3 = st.columns(3)
+    # create column span
+    col1.metric(label="N of >90%", value= millify(p90, precision=2))
+
+    col2.metric(label="N of >80%", value= millify(p80, precision=2))
+
+    col3.metric(label="N of 70%", value= millify(p70, precision=2))
 
     # this is used to style the metric card
     style_metric_cards(border_left_color="#DBF227")
