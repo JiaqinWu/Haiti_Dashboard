@@ -142,10 +142,17 @@ dash_2_1 = st.container()
 with dash_2_1:
     st.write("All the data is from last week's data!")
     # Get Description data
+    prediction['Date'] = pd.to_datetime(prediction['Date'])
+    # Extract the date part only
+    prediction['Date'] = prediction['Date'].dt.date
+    today = datetime.now().date()
+    yesterday = today - timedelta(days=1)
+    last_week = today - timedelta(days=7)
+    # Get Description data
     prediction1 = prediction[prediction['Date'] == last_week]
-    p90 = prediction1[prediction1['Probability']>90].count()
-    p80 = prediction1[prediction1['Probability']>80].count()
-    p70 = prediction1[prediction1['Probability']>70].count()
+    p90 = prediction1[prediction1['Probability']>90]['Probability'].count()
+    p80 = prediction1[prediction1['Probability']>80]['Probability'].count()
+    p70 = prediction1[prediction1['Probability']>70]['Probability'].count()
 
     col1, col2, col3 = st.columns(3)
     # create column span
