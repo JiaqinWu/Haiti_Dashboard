@@ -93,6 +93,7 @@ dash_1 = st.container()
 
 with dash_1:
     # Get Description data
+    st.markdown("**This dash shows the number of patients being diagnosis as PIT or Actif from all these data.**", unsafe_allow_html=True)
     total_ppl = prediction['EMR ID'].count()
     total_a = prediction[prediction['Prediction results']=='Actif']['EMR ID'].count()
     total_p = prediction[prediction['Prediction results']=='PIT']['EMR ID'].count()
@@ -113,6 +114,7 @@ dash_2 = st.container()
 
 with dash_2:
     # Get Description data
+    st.markdown("**This dash shows the number of patients used the predictive tool from the previous week's data.**", unsafe_allow_html=True)
     prediction['Date'] = pd.to_datetime(prediction['Date'])
     # Extract the date part only
     prediction['Date'] = prediction['Date'].dt.date
@@ -122,7 +124,7 @@ with dash_2:
 
     today_ppl = prediction[prediction['Date'] == today]['EMR ID'].count()
     yesterday_ppl = prediction[prediction['Date'] == yesterday]['EMR ID'].count()
-    lastweek_ppl = prediction[prediction['Date'] == last_week]['EMR ID'].count()
+    lastweek_ppl = prediction[(prediction['Date'] > last_week) & (prediction['Date'] <= today)]['EMR ID'].count()
 
 
     col1, col2, col3 = st.columns(3)
@@ -140,7 +142,7 @@ with dash_2:
 dash_2_1 = st.container()
 
 with dash_2_1:
-    st.write("All the data is from last week's data!")
+    st.markdown("**This dash shows the number of patients with high probability of being PIT for next 28 days from the previous week's data.**", unsafe_allow_html=True)
     # Get Description data
     prediction['Date'] = pd.to_datetime(prediction['Date'])
     # Extract the date part only
@@ -149,7 +151,7 @@ with dash_2_1:
     yesterday = today - timedelta(days=1)
     last_week = today - timedelta(days=7)
     # Get Description data
-    prediction1 = prediction[prediction['Date'] == last_week]
+    prediction1 = prediction[(prediction['Date'] > last_week) & (prediction['Date'] <= today)]
     p90 = prediction1[prediction1['Probability']>90]['Probability'].count()
     p80 = prediction1[prediction1['Probability']>80]['Probability'].count()
     p70 = prediction1[prediction1['Probability']>70]['Probability'].count()
@@ -172,12 +174,12 @@ with dash_3:
     col1, col2 = st.columns(2)
     with col1:
         date_values = prediction.groupby('Date')['EMR ID'].count().reset_index().rename(columns={'EMR ID':'Number'})
-        st.markdown("#### The Daily Prediction Number:")
+        st.markdown("**The Daily Prediction Number:**")
         st.dataframe(date_values)
 
     with col2:
         ins_values = prediction.groupby('Institution name')['EMR ID'].count().reset_index().rename(columns={'EMR ID':'Number'})
-        st.markdown("#### The Prediction Number by Institution:")
+        st.markdown("**The Prediction Number by Institution:**")
         st.dataframe(ins_values)
 # creates the container
 dash_4 = st.container()
@@ -186,12 +188,12 @@ with dash_4:
     col1, col2 = st.columns(2)
     with col1:
         dateins_values = prediction.groupby(['Date','Prediction results'])['EMR ID'].count().reset_index().rename(columns={'EMR ID':'Number'})
-        st.markdown("#### The Daily Prediction Number by Institution:")
+        st.markdown("**The Daily Prediction Number by Institution:**")
         st.dataframe(dateins_values)
 
     with col2:
         datestat_values = prediction.groupby(['Institution name','Prediction results'])['EMR ID'].count().reset_index().rename(columns={'EMR ID':'Number'})
-        st.markdown("#### The Prediction Number by Institution and Treatment Status:")
+        st.markdown("**The Prediction Number by Institution and Treatment Status:**")
         st.dataframe(datestat_values)
 
 # creates the container
@@ -224,6 +226,73 @@ with dash_5:
                 y=alt.Y('Institution:N', sort='-x', title='Institution Name')  # Rename y-axis 
             )
         chart = chart.properties(title="Number of PIT Patients in Top 10 Institution" )
+
+        st.altair_chart(chart,use_container_width=True)
+
+# creates the container
+dash_6 = st.container()
+
+with dash_6:
+    col1, col2 = st.columns(2)
+    prediction2 = prediction[(prediction['Date'] > last_week) & (prediction['Date'] <= today) & (prediction['Probability'] >90)]
+    top90 = prediction2.groupby('Institution name')['EMR ID'].count().reset_index().rename(columns={'Institution name':'Institution',\
+                                                                                                            'EMR ID':'Number'})
+    top90 = top90.nlargest(10, 'Number')
+
+    prediction3 = prediction[(prediction['Date'] > last_week) & (prediction['Date'] <= today) & (prediction['Probability'] >80)]
+    top80 = prediction3.groupby('Institution name')['EMR ID'].count().reset_index().rename(columns={'Institution name':'Institution',\
+                                                                                                            'EMR ID':'Number'})
+    top80 = top80.nlargest(10, 'Number')
+
+    # create the altair chart for top occupations
+    with col1:
+        chart = alt.Chart(top90).mark_bar(opacity=0.9,color="#9FC131").encode(
+                x=alt.X('sum(Number):Q', title='Number of Patients'),  # Rename x-axis
+                y=alt.Y('Institution:N', sort='-x', title='Institution Name')  # Rename y-axis 
+            )
+        chart = chart.properties(title="Number of Patients with Probability >90% in Top 10 Institution from previous week data" )
+
+        st.altair_chart(chart,use_container_width=True)
+    
+    with col2:
+        chart = alt.Chart(top80).mark_bar(opacity=0.9,color="#9FC131").encode(
+                x=alt.X('sum(Number):Q', title='Number of Patients'),  # Rename x-axis
+                y=alt.Y('Institution:N', sort='-x', title='Institution Name')  # Rename y-axis 
+            )
+        chart = chart.properties(title="Number of Patients with Probability >80% in Top 10 Institution from previous week data" )
+
+        st.altair_chart(chart,use_container_width=True)
+
+# creates the container
+dash_7 = st.container()
+
+with dash_7:
+    col1, col2 = st.columns(2)
+    prediction4 = prediction[(prediction['Date'] > last_week) & (prediction['Date'] <= today) & (prediction['Probability'] >70)]
+    top70 = prediction4.groupby('Institution name')['EMR ID'].count().reset_index().rename(columns={'Institution name':'Institution',\
+                                                                                                            'EMR ID':'Number'})
+    top70 = top70.nlargest(10, 'Number')
+
+    prediction5 = prediction[(prediction['Date'] > last_week) & (prediction['Date'] <= today)].sort_values(by='Probability').head(10)
+    prediction5['EMR_ID'] = prediction5['EMR ID']
+
+
+    # create the altair chart for top occupations
+    with col1:
+        chart = alt.Chart(top70).mark_bar(opacity=0.9,color="#9FC131").encode(
+                x=alt.X('sum(Number):Q', title='Number of Patients'),  # Rename x-axis
+                y=alt.Y('Institution:N', sort='-x', title='Institution Name')  # Rename y-axis 
+            )
+        chart = chart.properties(title="Number of Patients with Probability >70% in Top 10 Institution from previous week data" )
+
+        st.altair_chart(chart,use_container_width=True)
+    
+    with col2:
+        chart = alt.Chart(prediction5).mark_bar(opacity=0.9,color="#9FC131").encode(
+                x=alt.X('Probability:N', title='Probability'),  # Rename x-axis
+                y=alt.Y('EMR_ID:N', sort='-x', title='EMR ID')  # Rename y-axis 
+            )
+        chart = chart.properties(title="Top 10 patients with highest probability of being PIT for next 28 days" )
 
         st.altair_chart(chart,use_container_width=True)
 
