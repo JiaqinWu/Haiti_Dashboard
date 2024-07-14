@@ -289,10 +289,14 @@ with dash_7:
     
     with col2:
         chart = alt.Chart(prediction5).mark_bar(opacity=0.9,color="#9FC131").encode(
-                x=alt.X('Probability:N', title='Probability'),  # Rename x-axis
+                x=alt.X('Probability:N', title='Probability', scale=alt.Scale(domain=[0, 100])),  # Rename x-axis
                 y=alt.Y('EMR_ID:N', sort='-x', title='EMR ID')  # Rename y-axis 
             )
-        chart = chart.properties(title="Top 10 patients with highest probability of being PIT for next 28 days" )
+        chart = chart.properties(
+                width=600,  # Adjust width if necessary
+                height=300,  # Adjust height if necessary
+                title="Top 10 Patients with Highest Probability of Being PIT for Next 28 Days"
+            )
 
         st.altair_chart(chart,use_container_width=True)
 
